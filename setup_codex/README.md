@@ -7,6 +7,7 @@
 - `setup-root.sh`：root 版本，包含系统依赖安装。
 - `setup-user.sh`：普通用户版本，要求系统依赖已安装。
 - `config.toml`：安装时使用的配置模板，可修改模型、服务地址、权限和终端设置。
+- `auth.example.json`：仅含占位密钥的认证示例，可复制为 `auth.json` 后填写。
 - `auth.json`：自行创建的认证文件，已通过 `.gitignore` 忽略，不应提交。
 - `AGENTS.md`：贡献与维护指南。
 
@@ -15,15 +16,10 @@
 两种脚本都需要 Bash 和网络；脚本会继承当前终端的代理环境变量。根据权限选择 `setup-root.sh`（root）或 `setup-user.sh`（普通用户，依赖已安装）。
 
 1. 进入本项目目录。
-2. 创建 `auth.json`，填入所用模型服务的 API Key：
-
-   ```json
-   {
-     "OPENAI_API_KEY": "YOUR_API_KEY"
-   }
-   ```
+2. 从示例创建 `auth.json`，再将 `YOUR_API_KEY` 替换为所用模型服务的 API Key。已有认证文件时不要覆盖：
 
    ```bash
+   cp -n auth.example.json auth.json
    chmod 600 auth.json
    ```
 

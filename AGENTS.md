@@ -2,26 +2,28 @@
 
 ## Project Structure & Module Organization
 
-This repository contains two independent Linux development-environment utilities:
+This repository contains three independent Linux development-environment utilities:
 
 - `setup_codex/` — Debian/Ubuntu installer for nvm, Node.js 24, Codex CLI, local Codex configuration, and Deoxys plugins.
+- `setup_cc/` — ordinary-user installer for Claude Code, optional local settings, and a local Deoxys marketplace.
 - `setup_proxy/` — Mihomo lifecycle manager, VLESS configuration handling, shell proxy helpers, and connectivity diagnostics.
 - `README.md` — repository-level usage and migration instructions.
 
-Runtime data lives under `setup_proxy/.proxy/`. Treat `setup_codex/auth.json` and `setup_proxy/vless.txt` as secrets; do not publish their contents.
+Runtime data lives under `setup_proxy/.proxy/`. Treat `setup_codex/auth.json`, `setup_cc/settings.json`, and `setup_proxy/vless.txt` as secrets; do not publish their contents.
 
 ## Build, Test, and Development Commands
 
-There is no build system or package manager for this repository. Run focused checks from the relevant directory:
+There is no build system or package manager for this repository. Run these focused checks from the repository root:
 
 ```bash
-bash -n setup_codex/setup.sh
+bash -n setup_codex/setup-root.sh setup_codex/setup-user.sh setup_cc/setup-user.sh
+python3 -c 'import json; json.load(open("setup_codex/auth.example.json")); json.load(open("setup_cc/settings.example.json"))'
 python3 -c 'import tomllib; tomllib.load(open("setup_codex/config.toml", "rb"))'
 bash -n setup_proxy/proxy.sh setup_proxy/test_connection.sh
 python3 setup_proxy/mihomo.py check
 ```
 
-Use `python3 setup_proxy/mihomo.py start`, `proxyon`, and `proxyoff` only in an environment where starting the local proxy is intended. Do not run the Codex installer merely to validate documentation changes.
+Use `python3 setup_proxy/mihomo.py start`, `proxyon`, and `proxyoff` only in an environment where starting the local proxy is intended. Do not run either CLI installer merely to validate documentation changes.
 
 ## Coding Style & Naming Conventions
 
@@ -33,8 +35,10 @@ No automated test framework or coverage threshold is configured. Every shell cha
 
 ## Commit & Pull Request Guidelines
 
-This checkout currently has no Git history, so no established commit convention can be inferred. Use concise imperative commit subjects, for example `Improve proxy startup validation`. Pull requests should explain the affected utility, list validation commands and results, and call out configuration or security implications. Never include API keys, VLESS links, generated logs, or runtime state in commits.
+Existing subjects include `Add user setup for Claude Code`. Use concise imperative commit subjects, for example `Improve proxy startup validation`. Pull requests should explain the affected utility, list validation commands and results, and call out configuration or security implications. Never include API keys, VLESS links, generated logs, or runtime state in commits.
 
 ## Security & Configuration
 
-Keep `auth.json`, `vless.txt`, generated proxy configuration, and logs mode-restricted. Review changes to installer defaults, proxy bypass rules, external download URLs, and Codex permission settings carefully. Do not edit a user’s `~/.bashrc` or restart services during routine documentation review.
+Keep `auth.json`, local `settings.json`, `vless.txt`, generated proxy configuration, and logs mode-restricted. Review changes to installer defaults, proxy bypass rules, external download URLs, and Codex permission settings carefully. Do not edit a user’s `~/.bashrc` or restart services during routine documentation review.
+
+Claude settings are optional: missing, blank, or `{}` input preserves existing configuration; a nonempty object replaces it. Example JSON files must contain placeholder credentials only.

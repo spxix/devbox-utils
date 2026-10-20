@@ -25,7 +25,7 @@ source ~/.bashrc
 claude
 ```
 
-脚本会要求按回车确认代理可用，没有交互终端时取消安装。它会安装或更新 nvm、Node.js 24、Claude Code，向 `~/.bashrc` 添加不重复的 nvm 初始化行，仅在本目录 `settings.json` 为非空 JSON 对象时**覆盖** `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json`。文件缺失、只有空白或为 `{}` 时跳过复制；非法 JSON 会报错停止。请先自行备份目标目录中的个性化配置。
+脚本会要求按回车确认代理可用，没有交互终端时取消安装。它会安装或更新 nvm、Node.js 24、Claude Code，向 `~/.bashrc` 补充 nvm 初始化行（按整行文本去重，已有等价写法仍可能重复），仅在本目录 `settings.json` 为非空 JSON 对象时**覆盖** `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json`。文件缺失、只有空白或为 `{}` 时跳过复制；非法 JSON 会报错停止。请先自行备份目标目录中的个性化配置。
 
 配置目录权限为 `700`，复制的配置文件为 `600`。随后用普通 Git 将 Deoxys 克隆到 `~/.local/share/Deoxys`（已有仓库时执行 `git pull --ff-only`），沿用当前终端的 Git 认证环境，再让 Claude 注册本地市场。已有同名市场会先移除注册，再注册为本地来源。
 
@@ -50,8 +50,10 @@ claude
 
 ```bash
 bash -n setup-user.sh
-python3 -c 'import json; json.load(open("settings.json")); json.load(open("settings.example.json"))'
+python3 -c 'import json; json.load(open("settings.example.json"))'
 ```
+
+本地 `settings.json` 允许缺失或留空，不应无条件用 JSON 解析器检查它；安装脚本会检查其非空内容是否为 JSON 对象。
 
 安装后执行 `claude --version` 检查 CLI。此检查不验证模型服务认证和连通性；首次运行 `claude` 时按实际提示完成初始化。
 
