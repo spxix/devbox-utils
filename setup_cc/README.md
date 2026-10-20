@@ -13,7 +13,7 @@ cp settings.example.json settings.json
 chmod 600 settings.json
 ```
 
-编辑 `settings.json`，将 `ANTHROPIC_BASE_URL` 和 `ANTHROPIC_AUTH_TOKEN` 替换为实际服务地址和令牌。已有配置时不要用示例覆盖。脚本原样复制配置，不额外关闭权限审批。
+编辑 `settings.json`，将 `ANTHROPIC_BASE_URL` 和 `ANTHROPIC_AUTH_TOKEN` 替换为实际服务地址和令牌。已有配置时不要用示例覆盖。脚本原样复制配置，不额外关闭权限审批。 `CLAUDE_CODE_ATTRIBUTION_HEADER` 必须设置为字符串 `"1"`，否则当前服务配置无法正常使用。
 
 ## 安装与启动
 
