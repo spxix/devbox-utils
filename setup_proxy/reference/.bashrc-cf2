@@ -1,0 +1,395 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+# Ensure the Claude project sync cron job is present after container restarts.
+/root/ccheng/cron_jobs/upload-claude-projects-to-tos/ensure_daily_cron.sh >/dev/null 2>&1 || true
+
+# If not running interactively, don't do anything
+[ -z "$PS1" ] && return
+
+# don't put duplicate lines in the history. See bash(1) for more options
+# ... or force ignoredups and ignorespace
+HISTCONTROL=ignoredups:ignorespace
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=10000
+HISTFILESIZE=20000
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+    xterm-color) color_prompt=yes;;
+esac
+
+# uncomment for a colored prompt, if the terminal has the capability; turned
+# off by default to not distract the user: the focus in a terminal window
+# should be on the output of commands, not on the prompt
+#force_color_prompt=yes
+
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+	# We have color support; assume it's compliant with Ecma-48
+	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+	# a case would tend to support setf rather than setaf.)
+	color_prompt=yes
+    else
+	color_prompt=
+    fi
+fi
+
+if [ "$color_prompt" = yes ]; then
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+unset color_prompt force_color_prompt
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+    ;;
+*)
+    ;;
+esac
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    #alias dir='dir --color=auto'
+    #alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# some more ls aliases
+alias ll='ls -ahlF'
+alias la='ls -A'
+alias l='ls -CF'
+
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+    . /etc/bash_completion
+fi
+
+# Keep ls completions but avoid escaping '$' in inserted candidates (e.g. $PWD -> $PWD instead of \\$PWD)
+if type _longopt >/dev/null 2>&1; then
+    __ls_completion_unescape_dollar()
+    {
+        _longopt "$@"
+        local fixed candidate
+        fixed=()
+        for candidate in "${COMPREPLY[@]}"; do
+            candidate=${candidate//\\$/\$}
+            fixed+=("$candidate")
+        done
+        COMPREPLY=("${fixed[@]}")
+    }
+
+    complete -F __ls_completion_unescape_dollar ls
+fi
+
+# Enable Git command completion
+if [ -f /usr/share/bash-completion/completions/git ]; then
+    . /usr/share/bash-completion/completions/git
+fi
+
+if [[ $- == *i* ]]; then /opt/ml-platform/configure-sources/auto-configure.sh; fi
+[ -r ~/.volc/.profile ] && source ~/.volc/.profile #[volc installer]
+
+# # >>> conda initialize >>>
+# # !! Contents within this block are managed by 'conda init' !!
+# __conda_setup="$('/SPXvePFS/share/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+# if [ $? -eq 0 ]; then
+#     eval "$__conda_setup"
+# else
+#     if [ -f "/SPXvePFS/share/miniconda3/etc/profile.d/conda.sh" ]; then
+#         . "/SPXvePFS/share/miniconda3/etc/profile.d/conda.sh"
+#     else
+#         export PATH="/SPXvePFS/share/miniconda3/bin:$PATH"
+#     fi
+# fi
+# unset __conda_setup
+# # <<< conda initialize <<<
+
+export HISTTIMEFORMAT="%h %d %H:%M:%S "
+export HISTSIZE=100000
+
+parse_git_branch() {
+     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ git:(\1)/'
+}
+# 显示最后3层目录，不足3层则全部显示
+short_pwd() {
+    local dir="${PWD/#$HOME/~}"
+    echo "$dir" | awk -F'/' '{
+        n = NF
+        if (n <= 3) { print $0 }
+        else { print $(n-2)"/"$(n-1)"/"$n }
+    }'
+}
+GREEN='\[\033[00;32m\]'
+WHITE='\[\033[01;37m\]'
+RED='\[\033[00;31m\]'
+RESTORE='\[\033[0m\]'
+PS1="\[\033[01;32m\][\$(date +'%Y-%m-%d') \t]\[\033[00m\] ${WHITE}\$(short_pwd)${RED}\$(parse_git_branch) ${RESTORE}\$ "
+
+# github
+git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+git config --global alias.br branch
+git config --global alias.co checkout
+git config --global alias.ci commit
+git config --global alias.st status
+
+alias gru='git remote update'
+alias glg='git lg'
+alias gst='git st'
+alias gco='git co'
+alias gadd='git add'
+
+
+[[ -s /root/.autojump/etc/profile.d/autojump.sh ]] && source /root/.autojump/etc/profile.d/autojump.sh
+# tmux alias
+alias tmuxn='tmux new -s'
+alias tmuxl='tmux list-session'
+alias tmuxa='tmux attach-session -t'
+alias tmuxk='tmux kill-session -t'
+
+# tmux session name completion fallback (used when system tmux completion is absent).
+_tmux_session_name_complete() {
+    local cur prev cmd words
+    COMPREPLY=()
+    cmd="${COMP_WORDS[0]}"
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    if [[ ( "$cmd" == "tmuxa" || "$cmd" == "tmuxk" ) && "$COMP_CWORD" -eq 1 ]]; then
+        words="$(tmux list-sessions -F '#S' 2>/dev/null)"
+        COMPREPLY=( $(compgen -W "$words" -- "$cur") )
+        return 0
+    fi
+
+    if [[ "$prev" == "-t" || "$prev" == "--target-session" ]]; then
+        words="$(tmux list-sessions -F '#S' 2>/dev/null)"
+        COMPREPLY=( $(compgen -W "$words" -- "$cur") )
+        return 0
+    fi
+
+    if [[ "${COMP_WORDS[1]}" == "attach" || "${COMP_WORDS[1]}" == "attach-session" ]]; then
+        words="$(tmux list-sessions -F '#S' 2>/dev/null)"
+        COMPREPLY=( $(compgen -W "$words" -- "$cur") )
+        return 0
+    fi
+}
+
+if ! complete -p tmux >/dev/null 2>&1; then
+    complete -o default -F _tmux_session_name_complete tmux
+fi
+complete -o default -F _tmux_session_name_complete tmuxa tmuxk
+
+#
+alias kb=kubectl
+# compdef is a zsh function; avoid errors when sourcing under bash
+command -v compdef >/dev/null 2>&1 && compdef _kubectl kb
+
+alias k='kubectl'
+
+# 常用操作
+alias kg='k get'
+alias kd='k describe'
+alias ka='k apply -f'
+alias kdel='k delete -f'
+alias klogs='k logs -f'
+alias kexec='k exec -it'
+# 查看所有命名空间下的资源
+alias kga='k get all --all-namespaces'
+
+alias di='docker images'
+
+# --- Clash/Mihomo Proxy Aliases ---
+# HTTP proxy: 7897 (for apps like VS Code). SOCKS proxy: 7898 (more reliable; set as all_proxy).
+export CLASH_HTTP_PORT=7897
+export CLASH_SOCKS_PORT=7898
+alias proxyon="export http_proxy=http://127.0.0.1:\$CLASH_HTTP_PORT; export https_proxy=http://127.0.0.1:\$CLASH_HTTP_PORT; export all_proxy=socks5h://127.0.0.1:\$CLASH_SOCKS_PORT; echo \"Proxy ON (HTTP:\$CLASH_HTTP_PORT, SOCKS:\$CLASH_SOCKS_PORT)\""
+alias proxyoff="unset http_proxy; unset https_proxy; unset all_proxy; echo \"Proxy OFF\""
+# ----------------------------------
+
+print_ip_info() {
+  local label="$1"
+  local use_proxy="$2"
+  local color_reset="\033[0m"
+  local color_start=""
+  local curl_base=(curl -s --max-time 7 --connect-timeout 4)
+  # Explicit proxy curl to avoid relying on env when we want to force socks.
+  local curl_proxy_base=(curl -s --max-time 15 --connect-timeout 8 -x "socks5h://127.0.0.1:${CLASH_SOCKS_PORT:-7898}")
+  local ipv4 ipv6 ipv4_geo ipv6_geo
+
+  case "$label" in
+    before-proxyon) color_start="\033[31m" ;; # red
+    after-proxyon)  color_start="\033[32m" ;; # green
+    *)              color_start="" ;;
+  esac
+
+  if [ "$use_proxy" = "nopxy" ]; then
+    ipv4=$(env -u http_proxy -u https_proxy -u all_proxy "${curl_base[@]}" -4 ipv4.ip.sb 2>/dev/null || true)
+    ipv6=$(env -u http_proxy -u https_proxy -u all_proxy "${curl_base[@]}" -6 icanhazip.com 2>/dev/null || true)
+  else
+    ipv4=$("${curl_proxy_base[@]}" -4 http://ipv4.ip.sb 2>/dev/null || true)
+    ipv6=$("${curl_proxy_base[@]}" -6 http://icanhazip.com 2>/dev/null || true)
+  fi
+
+  ipv4_geo="n/a"
+  ipv6_geo="n/a"
+
+  get_geo() {
+    local ip="$1" mode="$2" url resp
+    url="https://ipapi.co/json"
+    [ -n "$ip" ] && url="https://ipapi.co/${ip}/json"
+    if [ "$mode" = "proxy" ]; then
+      resp=$("${curl_proxy_base[@]}" "$url" 2>/dev/null || true)
+    else
+      resp=$(env -u http_proxy -u https_proxy -u all_proxy "${curl_base[@]}" "$url" 2>/dev/null || true)
+    fi
+    python3 -c 'import sys, json
+data = sys.stdin.read()
+if not data.strip():
+    print("n/a"); sys.exit(0)
+try:
+    d = json.loads(data)
+except Exception:
+    print("n/a"); sys.exit(0)
+country = d.get("country_name") or d.get("country") or "n/a"
+city = d.get("city") or ""
+out = (country + " " + city).strip()
+print(out or "n/a")' <<<"$resp"
+  }
+
+  if [ -n "$ipv4" ]; then
+    if [ "$use_proxy" = "nopxy" ]; then
+      ipv4_geo=$(get_geo "" "direct")
+    else
+      ipv4_geo=$(get_geo "" "proxy")
+    fi
+  fi
+
+  if [ -n "$ipv6" ]; then
+    if [ "$use_proxy" = "nopxy" ]; then
+      ipv6_geo=$(get_geo "$ipv6" "direct")
+    else
+      ipv6_geo=$(get_geo "$ipv6" "proxy")
+    fi
+  fi
+
+  echo -e "${color_start}[IP][$label] IPv4: ${ipv4:-n/a} (${ipv4_geo:-n/a})${color_reset}"
+}
+
+print_ip_info "before-proxyon" "nopxy"
+proxyon
+# emoji is necessary
+print_ip_info "after-proxyon" "useproxy"
+
+# 定义切换到 SPX 环境的别名
+alias use_conda_spx='source /SPXvePFS/share/miniconda3/bin/activate'
+# 定义切换到 ROOT 环境的别名
+alias use_conda_root='source /root/miniconda3/bin/activate'
+
+export LANG="zh_CN.utf8"
+export LC_ALL="zh_CN.utf8"
+export LOCALE_ARCHIVE="/usr/lib/locale/locale-archive"
+export PATH="$HOME/.local/bin:$PATH"
+export no_proxy="127.0.0.1,localhost,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,100.64.0.0/10,local,.local,ivolces.com,.ivolces.com,volces.com,.volces.com,redis.ivolces.com,.redis.ivolces.com,volceapi.com,.volceapi.com,internal.spx,.internal.spx,tencentcloud.com,.tencentcloud.com,14.103.213.146"
+export NO_PROXY="$no_proxy"
+
+alias cc_dongyu="claude '**及时咨询**: 当执行一些蛋白质相关的复杂、长流程任务，并且没有明确的执行方案时，以及执行一些文档、写作相关的任务时，请先使用 < python /SPXvePFS/users/dyxue/Gemini/Ask_Gemini.py {要咨询的内容} > 来咨询 Gemini 3 pro 的建议'"
+alias USalign="/SPXvePFS/users/dyxue/Protein_Structure_Tools/USalign"
+alias TMalign="/SPXvePFS/users/dyxue/Protein_Structure_Tools/TMalign/TMalign"
+
+
+# Base64 快捷函数
+b64e() {
+    # 编码: b64e "string" 或 echo "string" | b64e
+    if [ -n "$1" ]; then
+        echo -n "$1" | base64
+    else
+        base64
+    fi
+}
+
+b64d() {
+    # 解码: b64d "base64string" 或 echo "base64string" | b64d
+    if [ -n "$1" ]; then
+        echo "$1" | base64 -d
+    else
+        base64 -d
+    fi
+}
+
+# Git branch protection wrapper
+git() {
+  local protected_branches="cc/origin/main"
+  if [[ "$1" == "branch" && ("$2" == "-d" || "$2" == "-D") ]]; then
+    for branch in $protected_branches; do
+      if [[ "$3" == "$branch" ]]; then
+        echo "Error: Branch '$branch' is protected and cannot be deleted."
+        return 1
+      fi
+    done
+  fi
+  command git "$@"
+}
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+. /usr/share/autojump/autojump.sh
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="/usr/local/go/bin/:$PATH"
+export PATH="$HOME/bin:$PATH"          # cac 命令
+# export PATH="/root/.cac/bin:$PATH"  # claude wrapper
+# cac us-http
+# cac xt-finger
+
+alias curl=/usr/bin/curl
+alias cccodex='codex -a never -s danger-full-access'
+
+export CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS="1"
+export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+export CLAUDE_CODE_ATTRIBUTION_HEADER=false
+
+# Claude CLI VPN 检查包装
+claude() {
+    if curl -sI --max-time 5 www.google.com 2>/dev/null | head -1 | grep -q "200"; then
+        /root/.local/bin/claude "$@"
+    else
+        echo -e "\033[31mVPN 未生效，不能使用 claude\033[0m"
+        return 1
+    fi
+}
