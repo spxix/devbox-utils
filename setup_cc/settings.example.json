@@ -1,0 +1,8 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-settings.json",
+    "env": {
+        "ANTHROPIC_BASE_URL": "https://your-api-gateway.example.com",
+        "ANTHROPIC_AUTH_TOKEN": "YOUR_AUTH_TOKEN",
+        "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+    }
+}
