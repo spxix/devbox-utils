@@ -7,7 +7,7 @@ Linux 开发环境实用工具：配置终端代理，以及安装、配置 Code
 | 目录 | 用途 | 使用说明 |
 | --- | --- | --- |
 | `setup_proxy/` | 管理 Mihomo 代理、切换终端代理环境变量、检查网络连通性 | [终端代理](setup_proxy/README.md) |
-| `setup_codex/` | 安装系统依赖、nvm、Node.js 24、Codex CLI 和 Deoxys 插件，应用本地配置 | [Codex 安装配置](setup_codex/README.md) |
+| `setup_codex/` | 通过 root 或普通用户脚本安装 nvm、Node.js 24、Codex CLI 和 Deoxys 插件，应用本地配置 | [Codex 安装配置](setup_codex/README.md) |
 
 两个工具可独立使用。如果安装 Codex 需要代理，先配置代理，再运行 Codex 安装脚本。
 
@@ -32,11 +32,13 @@ cd ..
 
 ### 2. 安装 Codex
 
-需要 Debian / Ubuntu 和 root 权限。先按 [Codex 说明](setup_codex/README.md) 准备 `setup_codex/auth.json`，并检查 `config.toml` 中的模型、服务地址和权限配置。
+需要 Debian / Ubuntu。先按 [Codex 说明](setup_codex/README.md) 准备 `setup_codex/auth.json`，并检查 `config.toml` 中的模型、服务地址和权限配置。依赖尚未安装时使用 root 脚本；依赖已由管理员准备好时使用普通用户脚本。
 
 ```bash
 cd setup_codex
-bash setup.sh
+bash setup-root.sh       # root，安装系统依赖
+# 或
+bash setup-user.sh       # 普通用户，不安装系统依赖
 source ~/.bashrc
 codex
 ```

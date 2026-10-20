@@ -4,17 +4,18 @@
 
 ## 文件说明
 
-- `setup.sh`：安装系统依赖、nvm、Node.js 24、最新版 Codex CLI 和插件。
+- `setup-root.sh`：root 版本，包含系统依赖安装。
+- `setup-user.sh`：普通用户版本，要求系统依赖已安装。
 - `config.toml`：安装时使用的配置模板，可修改模型、服务地址、权限和终端设置。
 - `auth.json`：自行创建的认证文件，已通过 `.gitignore` 忽略，不应提交。
 - `AGENTS.md`：贡献与维护指南。
 
 ## 安装前准备
 
-需要 root 用户、Bash、apt，以及访问系统软件源、GitHub、npm 和模型服务的网络。脚本会继承当前终端的代理环境变量。
+两种脚本都需要 Bash 和网络；脚本会继承当前终端的代理环境变量。根据权限选择 `setup-root.sh`（root）或 `setup-user.sh`（普通用户，依赖已安装）。
 
 1. 进入本项目目录。
-2. 在 `setup.sh` 同级目录创建 `auth.json`，填入所用模型服务的真实 API Key：
+2. 创建 `auth.json`，填入所用模型服务的 API Key：
 
    ```json
    {
@@ -39,25 +40,25 @@ approval_policy = "never"
 
 ## 安装与启动
 
-以 root 用户在项目目录执行：
+在项目目录执行对应脚本：
 
 ```bash
-bash setup.sh
+bash setup-root.sh       # root，安装系统依赖
+# 或
+bash setup-user.sh       # 普通用户，不安装系统依赖
 source ~/.bashrc
 codex
 ```
 
-脚本会安装依赖、配置 Bash 的 nvm 初始化，并将本目录的 `config.toml` 和 `auth.json` **覆盖复制**到 `${CODEX_HOME:-$HOME/.codex}`。如目标目录已有配置，请先备份。安装后的目录权限为 `700`，两个配置文件权限为 `600`。
+脚本会配置 Bash 的 nvm 初始化，并将配置文件覆盖复制到 `${CODEX_HOME:-$HOME/.codex}`；请用运行 Codex 的用户执行。
 
 安装操作开始前，脚本会提示开启代理。请确认当前终端的代理可用后按回车继续；否则按 Ctrl+C 退出。此步骤为人工确认，不会自动检测代理连通性；没有交互终端时会取消安装。
-
-安装过程还会重新注册 `spxix/Deoxys` 插件市场，并安装 `setup.sh` 中 `plugins` 数组列出的插件。需要调整插件时，修改该数组。
 
 如需指定配置目录，在安装和后续启动时使用同一个 `CODEX_HOME`：
 
 ```bash
 export CODEX_HOME=/path/to/codex-config
-bash setup.sh
+bash setup-root.sh  # 或 bash setup-user.sh
 source ~/.bashrc
 codex
 ```
@@ -71,7 +72,7 @@ codex
 仅检查脚本语法，无需实际安装：
 
 ```bash
-bash -n setup.sh
+bash -n setup-root.sh setup-user.sh
 ```
 
 使用 Python 3.11 或更高版本检查 TOML：

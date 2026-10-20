@@ -4,7 +4,8 @@
 
 This directory contains a small Codex bootstrap kit for Debian/Ubuntu environments:
 
-- `setup.sh`: root-only installer for system dependencies, nvm, Node.js 24, Codex CLI, and Deoxys plugins. It also initializes Bash and installs configuration files.
+- `setup-root.sh`: root installer, including system dependencies.
+- `setup-user.sh`: ordinary-user installer; system dependencies must already be available.
 - `config.toml`: source template for model, provider, permissions, and terminal settings.
 - `auth.json`: authentication input; treat its contents as sensitive.
 - `README.md`: user-facing instructions for authentication, configuration, installation, and startup.
@@ -14,9 +15,10 @@ There are no application modules, asset directories, build outputs, or automated
 
 ## Build, Test, and Development Commands
 
-- `bash -n setup.sh`: check Bash syntax without executing installation steps.
+- `bash -n setup-root.sh setup-user.sh`: check both installer scripts without executing installation steps.
 - `python3 -c 'import tomllib; tomllib.load(open("config.toml", "rb"))'`: validate TOML syntax with Python 3.11 or later.
-- `bash setup.sh`: run the installer as root on a suitable Debian/Ubuntu machine. This installs packages, updates `$HOME/.bashrc`, overwrites destination configuration, and installs plugins.
+- `bash setup-root.sh`: run the root installer on a suitable Debian/Ubuntu machine. This installs packages, updates `$HOME/.bashrc`, overwrites destination configuration, and installs plugins.
+- `bash setup-user.sh`: run the ordinary-user installer when system dependencies are already installed. This updates the current user's `$HOME/.bashrc`, overwrites destination configuration, and installs plugins.
 - `source ~/.bashrc` followed by `codex`: load the installed Node environment and launch Codex. Set `CODEX_HOME` when using a custom configuration destination.
 
 There is no separate build step. Do not run the installer merely to validate documentation changes.
