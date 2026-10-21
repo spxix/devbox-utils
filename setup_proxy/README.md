@@ -128,6 +128,7 @@ python3 mihomo.py start
 | `mihomo.py` | 启动、停止、状态查询和测试 |
 | `proxy.sh` | 定义 proxyon / proxyoff 命令，不含节点凭据 |
 | `test_connection.sh` | 8 项连通性测试、公网 IPv4 查询及 Cloudflare 连接诊断 |
+| `install_mihomo.sh` | 校验并安装上传到当前目录的 Mihomo 压缩包，不启动代理 |
 | `vless.txt` | VLESS 节点链接 |
 | `.proxy/mihomo` | 已安装的 Linux x86_64 代理程序，后续直接复用 |
 | `.proxy/config.json` | 启动时根据节点生成的配置 |
@@ -146,24 +147,20 @@ curl -fL --retry 3 --connect-timeout 20 \
   -o mihomo-linux-amd64-compatible-v1.19.32.gz \
   https://github.com/MetaCubeX/mihomo/releases/download/v1.19.32/mihomo-linux-amd64-compatible-v1.19.32.gz &&
 scp -P 端口号 mihomo-linux-amd64-compatible-v1.19.32.gz \
-  用户名@服务器地址:/path/to/devbox-utils/
+  用户名@服务器地址:/path/to/devbox-utils/setup_proxy/
 ```
 
-在 **服务器** 执行（校验成功后才会继续解压）：
+在 **服务器** 的 `setup_proxy` 目录执行（校验成功后才会继续解压）：
 
 ```bash
-cd /path/to/devbox-utils &&
-echo 'ba3ce607747a07f948fc35780e108a4a7c7f552a38b9bd4d115f313ebcb89c20  mihomo-linux-amd64-compatible-v1.19.32.gz' | sha256sum -c - &&
-cd setup_proxy &&
-python3 mihomo.py stop &&
-mkdir -p .proxy &&
-chmod 700 .proxy &&
-gzip -dc ../mihomo-linux-amd64-compatible-v1.19.32.gz > .proxy/mihomo &&
-chmod 700 .proxy/mihomo &&
+cd /path/to/devbox-utils/setup_proxy
+bash install_mihomo.sh
 python3 mihomo.py start &&
 source proxy.sh &&
 proxyon &&
 python3 mihomo.py test
 ```
+
+`install_mihomo.sh` 会校验压缩包、停止旧进程、解压到 `.proxy/mihomo` 并设置权限；它不启动代理，完成后再执行 `python3 mihomo.py start`。
 
 安装后文件保存在持久化目录中，后续直接运行 `python3 mihomo.py start`。
