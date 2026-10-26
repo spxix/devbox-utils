@@ -1,6 +1,7 @@
 model_provider = "OpenAI"
 model = "gpt-6-astra"
 review_model = "gpt-6-astra"
+model_reasoning_effort = "xhigh"
 
 sandbox_mode = "danger-full-access"
 approval_policy = "never"
