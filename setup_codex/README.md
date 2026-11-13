@@ -6,64 +6,78 @@
 
 - `setup-root.sh`：root 版本，包含系统依赖安装。
 - `setup-user.sh`：普通用户版本，要求系统依赖已安装。
-- `config.toml`：安装时使用的配置模板，可修改模型、服务地址、权限和终端设置。
-- `auth.example.json`：仅含占位密钥的认证示例，可复制为 `auth.json` 后填写。
-- `auth.json`：自行创建的认证文件，已通过 `.gitignore` 忽略，不应提交。
+- `config.toml`：安装时复制的配置模板，包含模型、权限和终端设置。
 - `AGENTS.md`：贡献与维护指南。
+
+登录凭据由 Codex 登录流程管理并自动刷新。登录后，缓存可能保存在系统凭据存储或
+`${CODEX_HOME}/auth.json`；它不是安装输入文件，不应提交或分享。
 
 ## 安装前准备
 
-两种脚本都需要 Bash 和网络；脚本会继承当前终端的代理环境变量。根据权限选择 `setup-root.sh`（root）或 `setup-user.sh`（普通用户，依赖已安装）。
+两种脚本都需要 Bash 和网络；脚本会继承当前终端的代理环境变量。根据实际运行
+Codex 的用户选择 `setup-root.sh`（root）或 `setup-user.sh`（普通用户，依赖已安装）。
+请使用实际运行 Codex 的用户安装，以保持 nvm、配置目录权限和登录凭据一致。
 
-1. 进入本项目目录。
-2. 从示例创建 `auth.json`，再将 `YOUR_API_KEY` 替换为所用模型服务的 API Key。已有认证文件时不要覆盖：
+两个脚本默认将配置和插件安装到 `/SPXvePFS/users/wndai/.codex`；已有的非空
+`CODEX_HOME` 环境变量优先。安装用户需要有目标目录的写权限。脚本不会自动迁移
+原 `~/.codex` 中的登录缓存、历史记录或其他数据。
 
-   ```bash
-   cp -n auth.example.json auth.json
-   chmod 600 auth.json
-   ```
+安装脚本会将选定目录写入 `~/.bashrc` 的 `export CODEX_HOME=...`。安装后执行
+`source ~/.bashrc`，或打开新的 Bash 终端，即可直接输入 `codex` 使用该目录。
+重复安装不会重复追加该设置；更换目录后会更新脚本管理的设置行。
 
-3. 检查 `config.toml` 中的 `model`、`review_model` 和 `[model_providers.OpenAI]` 下的 `base_url`。当前模板指向第三方服务；请按实际服务修改地址和模型，并使用对应的 Key。
-
-当前模板默认开启 **Full Access**，禁用沙箱和命令审批：
+当前模板默认使用 Codex 内置的 `openai` provider 和 `gpt-6-astra`，并开启 Full
+Access、禁用命令审批：
 
 ```toml
 sandbox_mode = "danger-full-access"
 approval_policy = "never"
 ```
 
-这两项位于文件顶层，应写在第一个 `[配置段]` 之前。
+## 安装、登录与启动
 
-## 安装与启动
-
-在项目目录执行对应脚本：
+在本目录执行对应脚本：
 
 ```bash
 bash setup-root.sh       # root，安装系统依赖
 # 或
 bash setup-user.sh       # 普通用户，不安装系统依赖
 source ~/.bashrc
+codex login
+codex login status
 codex
 ```
 
-脚本会配置 Bash 的 nvm 初始化，并将配置文件覆盖复制到 `${CODEX_HOME:-$HOME/.codex}`；请用运行 Codex 的用户执行。
+远程服务器没有浏览器时，在服务器上执行设备授权登录：
 
-安装操作开始前，脚本会提示开启代理。请确认当前终端的代理可用后按回车继续；否则按 Ctrl+C 退出。此步骤为人工确认，不会自动检测代理连通性；没有交互终端时会取消安装。
+```bash
+codex login --device-auth
+```
 
-如需指定配置目录，在安装和后续启动时使用同一个 `CODEX_HOME`：
+命令显示网址和一次性验证码后，在其他设备的浏览器中完成 ChatGPT 账号登录。
+登录和启动时必须使用同一个 `CODEX_HOME`。安装脚本不会自动执行登录，也不会覆盖
+目标目录中已有的登录缓存；重复运行脚本只更新 `config.toml`、CLI 和插件。
+
+安装操作开始前，脚本会提示开启代理。请确认当前终端的代理可用后按回车继续；否则
+按 Ctrl+C 退出。此步骤为人工确认，不会自动检测代理连通性；没有交互终端时会取消安装。
+
+如需指定配置目录，在安装和后续登录、启动时使用同一个 `CODEX_HOME`：
 
 ```bash
 export CODEX_HOME=/path/to/codex-config
 bash setup-root.sh  # 或 bash setup-user.sh
 source ~/.bashrc
+codex login
 codex
 ```
 
-新终端也需要设置这个环境变量。脚本不会自动保存自定义 `CODEX_HOME`。
+安装脚本也会把自定义目录保存到 `.bashrc`。对于不加载 `.bashrc` 的环境（如定时
+任务或其他 shell），仍需显式设置同一个 `CODEX_HOME`。
 
 ## 修改配置与检查
 
-本目录的 `config.toml` 是安装模板；修改它不会自动更新已经安装的配置。重新运行安装脚本会再次安装/更新 CLI 和插件，并覆盖目标配置。
+本目录的 `config.toml` 是安装模板；修改它不会自动更新已经安装的配置。重新运行
+安装脚本会再次安装或更新 CLI 和插件，并覆盖目标配置，但会保留 Codex 登录缓存。
 
 仅检查脚本语法，无需实际安装：
 
@@ -76,5 +90,3 @@ bash -n setup-root.sh setup-user.sh
 ```bash
 python3 -c 'import tomllib; tomllib.load(open("config.toml", "rb"))'
 ```
-
-不要在日志、提交或问题描述中包含 API Key。`.gitignore` 不会取消对已被 Git 跟踪文件的跟踪；若曾提交 `auth.json`，需另行移除跟踪，并更换已泄露的 Key。

@@ -1,16 +1,10 @@
-model_provider = "OpenAI"
+model_provider = "openai"
 model = "gpt-6-astra"
 review_model = "gpt-6-astra"
 model_reasoning_effort = "xhigh"
 
 sandbox_mode = "danger-full-access"
 approval_policy = "never"
-
-[model_providers.OpenAI]
-name = "OpenAI"
-base_url = "https://sub2api.chatfold.pro/v1"
-wire_api = "responses"
-requires_openai_auth = true
 
 [features]
 goals = true

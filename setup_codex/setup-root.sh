@@ -9,11 +9,11 @@ if [[ "$(id -u)" != 0 ]]; then
 fi
 
 script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-config_dir="${CODEX_HOME:-$HOME/.codex}"
+config_dir="${CODEX_HOME:-/SPXvePFS/users/wndai/.codex}"
 nvm_version="v0.40.8"
 export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 
-for file in auth.json config.toml; do
+for file in config.toml; do
     if [[ ! -f "$script_dir/$file" || ! -r "$script_dir/$file" ]]; then
         echo "缺少或无法读取：$script_dir/$file" >&2
         exit 1
@@ -60,7 +60,7 @@ echo "==> 安装 Codex，正在获取平台二进制包，请耐心等待"
 npm install -g @openai/codex@latest --bin-links=true --loglevel=info
 hash -r
 
-# 6. 添加 nvm 的 Bash 初始化配置，避免重复追加
+# 6. 添加 nvm 和 CODEX_HOME 的 Bash 初始化配置，避免重复追加
 touch "$HOME/.bashrc"
 
 nvm_path_line="$(printf 'export NVM_DIR=%q' "$NVM_DIR")"
@@ -69,11 +69,18 @@ for line in "$nvm_path_line" "$nvm_load_line"; do
     grep -Fqx -- "$line" "$HOME/.bashrc" || printf '\n%s\n' "$line" >> "$HOME/.bashrc"
 done
 
+codex_home_line="$(printf 'export CODEX_HOME=%q # setup_codex' "$config_dir")"
+if ! grep -Fqx -- "$codex_home_line" "$HOME/.bashrc"; then
+    sed '/^export CODEX_HOME=.* # setup_codex$/d' "$HOME/.bashrc" > "$temp_dir/bashrc"
+    printf '\n%s\n' "$codex_home_line" >> "$temp_dir/bashrc"
+    cat -- "$temp_dir/bashrc" > "$HOME/.bashrc"
+fi
+
 # 7. 复制配置，覆盖同名文件；权限设为仅当前用户可读写
 echo "==> 复制 Codex 配置"
 mkdir -p -- "$config_dir"
 chmod 700 -- "$config_dir"
-for file in auth.json config.toml; do
+for file in config.toml; do
     if [[ ! "$script_dir/$file" -ef "$config_dir/$file" ]]; then
         install -m 600 -- "$script_dir/$file" "$config_dir/$file"
     fi
@@ -112,5 +119,9 @@ for i in "${!plugins[@]}"; do
     CODEX_HOME="$config_dir" codex plugin add "${plugins[i]}"
 done
 
-printf '\n安装完成。当前终端执行：\n  source %q\n' "$HOME/.bashrc"
-printf '然后启动：\n  CODEX_HOME=%q codex\n' "$config_dir"
+printf '\n安装完成。请在实际运行 Codex 的用户当前终端执行：\n'
+printf '  source %q\n' "$HOME/.bashrc"
+printf '然后登录 ChatGPT 订阅账号：\n  codex login\n'
+printf '远程服务器可使用设备授权：\n  codex login --device-auth\n'
+printf '登录状态检查：\n  codex login status\n'
+printf '登录后启动：\n  codex\n'

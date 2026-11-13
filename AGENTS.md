@@ -9,7 +9,7 @@ This repository contains three independent Linux development-environment utiliti
 - `setup_proxy/` — Mihomo lifecycle manager, VLESS configuration handling, shell proxy helpers, and connectivity diagnostics.
 - `README.md` — repository-level usage and migration instructions.
 
-Runtime data lives under `setup_proxy/.proxy/`. Treat `setup_codex/auth.json`, `setup_cc/settings.json`, and `setup_proxy/vless.txt` as secrets; do not publish their contents.
+Runtime data lives under `setup_proxy/.proxy/`. Treat `setup_codex/auth.json` as a Codex-generated sensitive login cache, and treat `setup_cc/settings.json` and `setup_proxy/vless.txt` as local secrets; do not publish their contents.
 
 ## Build, Test, and Development Commands
 
@@ -17,7 +17,7 @@ There is no build system or package manager for this repository. Run these focus
 
 ```bash
 bash -n setup_codex/setup-root.sh setup_codex/setup-user.sh setup_cc/setup-user.sh
-python3 -c 'import json; json.load(open("setup_codex/auth.example.json")); json.load(open("setup_cc/settings.example.json"))'
+python3 -c 'import json; json.load(open("setup_cc/settings.example.json"))'
 python3 -c 'import tomllib; tomllib.load(open("setup_codex/config.toml", "rb"))'
 bash -n setup_proxy/proxy.sh setup_proxy/test_connection.sh
 python3 setup_proxy/mihomo.py check
@@ -39,6 +39,6 @@ Existing subjects include `Add user setup for Claude Code`. Use concise imperati
 
 ## Security & Configuration
 
-Keep `auth.json`, local `settings.json`, `vless.txt`, generated proxy configuration, and logs mode-restricted. Review changes to installer defaults, proxy bypass rules, external download URLs, and Codex permission settings carefully. Do not edit a user’s `~/.bashrc` or restart services during routine documentation review.
+Keep the Codex-generated `auth.json` cache, local `settings.json`, `vless.txt`, generated proxy configuration, and logs mode-restricted. Review changes to installer defaults, proxy bypass rules, external download URLs, and Codex permission settings carefully. Do not edit a user’s `~/.bashrc` or restart services during routine documentation review.
 
 Claude settings are optional: missing, blank, or `{}` input preserves existing configuration; a nonempty object replaces it. Example JSON files must contain placeholder credentials only.

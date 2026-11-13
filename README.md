@@ -33,7 +33,9 @@ cd ..
 
 ### 2. 安装 Codex
 
-需要 Debian / Ubuntu。先按 [Codex 说明](setup_codex/README.md) 从 `setup_codex/auth.example.json` 复制并填写 `setup_codex/auth.json`，并检查 `config.toml` 中的模型、服务地址和权限配置。依赖尚未安装时使用 root 脚本；依赖已由管理员准备好时使用普通用户脚本。
+需要 Debian / Ubuntu。先阅读 [Codex 说明](setup_codex/README.md)，确认实际运行
+Codex 的用户和 `CODEX_HOME`。依赖尚未安装时使用 root 脚本；依赖已由管理员准备好时
+使用普通用户脚本。
 
 ```bash
 cd setup_codex
@@ -41,10 +43,16 @@ bash setup-root.sh       # root，安装系统依赖
 # 或
 bash setup-user.sh       # 普通用户，不安装系统依赖
 source ~/.bashrc
+codex login
 codex
 ```
 
-安装脚本会提示确认代理已开启，并覆盖 `${CODEX_HOME:-$HOME/.codex}` 中的认证和配置文件。
+安装脚本会提示确认代理已开启，并只更新 `${CODEX_HOME:-/SPXvePFS/users/wndai/.codex}` 中的配置文件。
+已有的非空 `CODEX_HOME` 优先；脚本会将选定目录保存到 `~/.bashrc`，加载后直接运行
+`codex` 即使用该目录。脚本不会自动迁移原 `~/.codex` 的数据。
+安装完成后由实际运行用户执行 `codex login`；远程服务器可执行
+`codex login --device-auth`。登录和启动时保持同一个 `CODEX_HOME`。Codex 可能自动生成
+`auth.json` 登录缓存，请勿提交或分享。
 
 ### 3. 安装 Claude Code（按需选择）
 
@@ -63,6 +71,6 @@ claude
 
 ## 本地文件与目录迁移
 
-`setup_codex/auth.json`、`setup_cc/settings.json`、`setup_proxy/vless.txt` 和 `setup_proxy/.proxy/` 是本机认证、节点及运行数据，不是通用示例配置。当前机器已有的这些文件随工具目录一起保留；在其他机器使用时需自行准备。
+`setup_codex/auth.json`、`setup_cc/settings.json`、`setup_proxy/vless.txt` 和 `setup_proxy/.proxy/` 是本机认证、节点及运行数据。`auth.json` 由 Codex 登录流程自动生成，可能改为保存在系统凭据存储中；不要提交或分享这些文件。在其他机器使用时需重新完成登录并自行准备其他本机配置。
 
 如果此前已经使用代理工具，移动目录后，已有 `~/.bashrc` 中的 `source` 路径可能仍指向旧目录，需要改为新位置。当前终端可直接 `source ./setup_proxy/proxy.sh` 加载新路径下的命令。运行中的 Mihomo 进程记录也可能保留旧路径；迁移目录不会自动重启代理或修复这些运行记录。

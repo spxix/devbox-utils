@@ -7,9 +7,9 @@ This directory contains a small Codex bootstrap kit for Debian/Ubuntu environmen
 - `setup-root.sh`: root installer, including system dependencies.
 - `setup-user.sh`: ordinary-user installer; system dependencies must already be available.
 - `config.toml`: source template for model, provider, permissions, and terminal settings.
-- `auth.json`: authentication input; treat its contents as sensitive.
+- `auth.json`: Codex-generated login cache; it is not an installer input and its contents are sensitive.
 - `README.md`: user-facing instructions for authentication, configuration, installation, and startup.
-- `.gitignore`: excludes the local authentication file `auth.json` from Git.
+- `.gitignore`: excludes the Codex-generated login cache `auth.json` from Git.
 
 There are no application modules, asset directories, build outputs, or automated test suites.
 
@@ -17,9 +17,9 @@ There are no application modules, asset directories, build outputs, or automated
 
 - `bash -n setup-root.sh setup-user.sh`: check both installer scripts without executing installation steps.
 - `python3 -c 'import tomllib; tomllib.load(open("config.toml", "rb"))'`: validate TOML syntax with Python 3.11 or later.
-- `bash setup-root.sh`: run the root installer on a suitable Debian/Ubuntu machine. This installs packages, updates `$HOME/.bashrc`, overwrites destination configuration, and installs plugins.
-- `bash setup-user.sh`: run the ordinary-user installer when system dependencies are already installed. This updates the current user's `$HOME/.bashrc`, overwrites destination configuration, and installs plugins.
-- `source ~/.bashrc` followed by `codex`: load the installed Node environment and launch Codex. Set `CODEX_HOME` when using a custom configuration destination.
+- `bash setup-root.sh`: run the root installer on a suitable Debian/Ubuntu machine. This installs packages, updates `$HOME/.bashrc`, updates the destination configuration, preserves the Codex login cache, and installs plugins.
+- `bash setup-user.sh`: run the ordinary-user installer when system dependencies are already installed. This updates the current user's `$HOME/.bashrc`, updates the destination configuration, preserves the Codex login cache, and installs plugins.
+- `source ~/.bashrc`, followed by `codex login` and `codex`: load the installed Node environment and the persisted `CODEX_HOME`, authenticate the actual runtime user, and launch Codex. Set the same `CODEX_HOME` explicitly in environments that do not load `.bashrc`.
 
 There is no separate build step. Do not run the installer merely to validate documentation changes.
 
@@ -39,4 +39,4 @@ This checkout contains no Git metadata, so established commit conventions cannot
 
 ## Security & Configuration
 
-Never include authentication values in commits, logs, or review descriptions. Installed configuration directories use mode `700`; configuration and authentication files use `600`. The current template enables Full Access with approvals disabled. Review permission changes explicitly. Edit this directory’s template for installer defaults; installation copies it to `${CODEX_HOME:-$HOME/.codex}`.
+Never include authentication values in commits, logs, or review descriptions. Codex creates and manages its login cache after `codex login`; it may use the system credential store or `${CODEX_HOME}/auth.json`. Installed configuration directories use mode `700`; the copied configuration file uses `600`. The current template enables Full Access with approvals disabled. Review permission changes explicitly. Edit this directory’s template for installer defaults; installation copies it to `${CODEX_HOME:-/SPXvePFS/users/wndai/.codex}` without replacing the login cache. The installer persists the selected `CODEX_HOME` in `.bashrc` on a line marked `# setup_codex`, updating that line when the destination changes. Existing data is not migrated automatically.
