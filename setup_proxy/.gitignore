@@ -1,3 +1,4 @@
 vless.txt
+vless.*.txt
 .proxy/
 __pycache__/
