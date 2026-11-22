@@ -2,6 +2,50 @@
 set -eo pipefail
 umask 022
 
+usage() {
+    cat <<'EOF'
+用法: bash setup-root.sh [选项]
+
+选项:
+  --hub-version <ver>   指定预安装的 Antigravity Hub Server 版本（默认取最新稳定版）
+  --skip-hub-download   仅配置 SSH 代理钩子，跳过 ~/.antigravity-hub-server 预下载
+  -h, --help            显示本帮助信息
+EOF
+}
+
+ssh_server_args=()
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --hub-version)
+            if [[ $# -lt 2 ]]; then
+                echo "缺少参数值：$1" >&2
+                exit 1
+            fi
+            ssh_server_args+=(--version "$2")
+            shift 2
+            ;;
+        --hub-version=*)
+            ssh_server_args+=(--version "${1#*=}")
+            shift
+            ;;
+        --skip-hub-download)
+            ssh_server_args+=(--skip-download)
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "未知选项：$1" >&2
+            usage >&2
+            exit 1
+            ;;
+    esac
+done
+
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
 # 1. 检查运行用户
 if [[ "$(id -u)" != 0 ]]; then
     echo "请以 root 用户执行；普通用户请使用 setup-user.sh。" >&2
@@ -20,9 +64,12 @@ temp_dir="$(mktemp -d)"
 trap 'rm -rf -- "$temp_dir"' EXIT
 binary_path="$HOME/.local/bin/agy"
 
-# 2. 安装系统依赖；Antigravity CLI 使用原生二进制，不需要 Node.js
+# 2. 安装系统依赖；Antigravity CLI 与 SSH Hub Server 使用原生二进制，不需要 Node.js
 echo "==> 安装系统依赖"
-packages=(ca-certificates curl coreutils tar gzip grep sed)
+packages=(ca-certificates curl coreutils tar gzip grep sed procps util-linux)
+if ! command -v awk >/dev/null 2>&1; then
+    packages+=(mawk)
+fi
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${packages[@]}"
 
@@ -69,7 +116,11 @@ agy() {
 BASHRC
 fi
 
+# 6. 配置 Antigravity Desktop SSH 远端代理钩子并预下载 Hub Server
+echo "==> 配置 Antigravity Desktop SSH 远端环境"
+bash "$script_dir/setup-ssh-server.sh" --no-confirm "${ssh_server_args[@]}"
+
 printf '\n安装完成。请在实际运行 Antigravity CLI 的用户当前终端执行：\n'
 printf '  source %q\n' "$HOME/.bashrc"
 printf '  agy --version\n'
-printf '然后进入项目目录并运行 agy，按提示完成首次登录。\n'
+printf '然后进入项目目录并运行 agy，按提示完成首次登录；桌面端也可直接通过 Connect to SSH Host 连接本机。\n'

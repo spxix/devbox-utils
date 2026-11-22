@@ -2,8 +2,52 @@
 set -eo pipefail
 umask 022
 
+usage() {
+    cat <<'EOF'
+用法: bash setup-user.sh [选项]
+
+选项:
+  --hub-version <ver>   指定预安装的 Antigravity Hub Server 版本（默认取最新稳定版）
+  --skip-hub-download   仅配置 SSH 代理钩子，跳过 ~/.antigravity-hub-server 预下载
+  -h, --help            显示本帮助信息
+EOF
+}
+
+ssh_server_args=()
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --hub-version)
+            if [[ $# -lt 2 ]]; then
+                echo "缺少参数值：$1" >&2
+                exit 1
+            fi
+            ssh_server_args+=(--version "$2")
+            shift 2
+            ;;
+        --hub-version=*)
+            ssh_server_args+=(--version "${1#*=}")
+            shift
+            ;;
+        --skip-hub-download)
+            ssh_server_args+=(--skip-download)
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "未知选项：$1" >&2
+            usage >&2
+            exit 1
+            ;;
+    esac
+done
+
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
 # 1. 检查系统依赖；普通用户无需 sudo
-for dependency in curl tar gzip sha512sum grep sed mktemp; do
+for dependency in curl tar gzip sha512sum grep sed awk od ps pgrep mktemp; do
     if ! command -v "$dependency" >/dev/null 2>&1; then
         echo "缺少系统依赖：$dependency，请由管理员安装后重试。" >&2
         exit 1
@@ -65,7 +109,11 @@ agy() {
 BASHRC
 fi
 
+# 5. 配置 Antigravity Desktop SSH 远端代理钩子并预下载 Hub Server
+echo "==> 配置 Antigravity Desktop SSH 远端环境"
+bash "$script_dir/setup-ssh-server.sh" --no-confirm "${ssh_server_args[@]}"
+
 printf '\n安装完成。请在实际运行 Antigravity CLI 的用户当前终端执行：\n'
 printf '  source %q\n' "$HOME/.bashrc"
 printf '  agy --version\n'
-printf '然后进入项目目录并运行 agy，按提示完成首次登录。\n'
+printf '然后进入项目目录并运行 agy，按提示完成首次登录；桌面端也可直接通过 Connect to SSH Host 连接本机。\n'

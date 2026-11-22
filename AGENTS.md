@@ -6,7 +6,7 @@ This repository contains four independent Linux development-environment utilitie
 
 - `setup_codex/` — Debian/Ubuntu installer for nvm, Node.js 24, Codex CLI, local Codex configuration, and Deoxys plugins.
 - `setup_cc/` — ordinary-user installer for Claude Code, optional local settings, and a local Deoxys marketplace.
-- `setup_agy/` — root and ordinary-user installers for the native Antigravity CLI (`agy`), without preconfigured credentials.
+- `setup_agy/` — root and ordinary-user installers for the native Antigravity CLI (`agy`) and Antigravity Desktop SSH remote server (`setup-ssh-server.sh`), without preconfigured credentials.
 - `setup_proxy/` — Mihomo lifecycle manager, VLESS configuration handling, shell proxy helpers, and connectivity diagnostics.
 - `README.md` — repository-level usage and migration instructions.
 
