@@ -2,10 +2,11 @@
 
 ## Project Structure & Module Organization
 
-This repository contains three independent Linux development-environment utilities:
+This repository contains four independent Linux development-environment utilities:
 
 - `setup_codex/` — Debian/Ubuntu installer for nvm, Node.js 24, Codex CLI, local Codex configuration, and Deoxys plugins.
 - `setup_cc/` — ordinary-user installer for Claude Code, optional local settings, and a local Deoxys marketplace.
+- `setup_agy/` — root and ordinary-user installers for the native Antigravity CLI (`agy`), without preconfigured credentials.
 - `setup_proxy/` — Mihomo lifecycle manager, VLESS configuration handling, shell proxy helpers, and connectivity diagnostics.
 - `README.md` — repository-level usage and migration instructions.
 
@@ -17,6 +18,7 @@ There is no build system or package manager for this repository. Run these focus
 
 ```bash
 bash -n setup_codex/setup-root.sh setup_codex/setup-user.sh setup_cc/setup-user.sh
+for script in setup_agy/*.sh; do bash -n "$script" || exit; done
 python3 -c 'import json; json.load(open("setup_cc/settings.example.json"))'
 python3 -c 'import tomllib; tomllib.load(open("setup_codex/config.toml", "rb"))'
 bash -n setup_proxy/proxy.sh setup_proxy/test_connection.sh

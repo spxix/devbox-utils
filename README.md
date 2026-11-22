@@ -1,6 +1,6 @@
 # devbox-utils
 
-Linux 开发环境实用工具：配置终端代理，以及安装、配置 Codex CLI 和 Claude Code。
+Linux 开发环境实用工具：配置终端代理，以及安装 Codex CLI、Claude Code 和 Antigravity CLI。
 
 ## 目录
 
@@ -9,8 +9,9 @@ Linux 开发环境实用工具：配置终端代理，以及安装、配置 Code
 | `setup_proxy/` | 管理 Mihomo 代理、切换终端代理环境变量、检查网络连通性 | [终端代理](setup_proxy/README.md) |
 | `setup_codex/` | 通过 root 或普通用户脚本安装 nvm、Node.js 24、Codex CLI 和 Deoxys 插件，应用本地配置 | [Codex 安装配置](setup_codex/README.md) |
 | `setup_cc/` | 通过普通用户脚本安装 nvm、Node.js 24、Claude Code 和 Deoxys 插件，可选应用本地配置 | [Claude Code 安装配置](setup_cc/README.md) |
+| `setup_agy/` | 通过 root 或普通用户脚本安装 Antigravity CLI（`agy`），不预置登录凭据 | [Antigravity CLI 安装](setup_agy/README.md) |
 
-三个工具可独立使用。如果安装 CLI 需要代理，先配置代理，再选择对应的安装脚本。
+四个工具可独立使用。如果安装 CLI 需要代理，先配置代理，再选择对应的安装脚本。
 
 ## 使用顺序
 
@@ -54,6 +55,9 @@ codex
 `codex login --device-auth`。登录和启动时保持同一个 `CODEX_HOME`。Codex 可能自动生成
 `auth.json` 登录缓存，请勿提交或分享。
 
+安装会向 `.bashrc` 追加与 Claude Code 相同的代理检查包装函数；加载后执行
+`codex` 会先检查 Google HTTP 响应，检查失败时阻止启动。
+
 ### 3. 安装 Claude Code（按需选择）
 
 需要 Debian / Ubuntu，且管理员已安装系统依赖。按 [Claude Code 说明](setup_cc/README.md) 准备认证：可以沿用终端环境变量或目标目录的已有配置，也可以从 `settings.example.json` 创建本地 `settings.json`。
@@ -68,6 +72,27 @@ claude
 ```
 
 本地 `settings.json` 缺失、空白或为 `{}` 时保留目标配置；非空 JSON 对象会覆盖 `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json`，不是合并。脚本使用普通 Git 下载或更新 `~/.local/share/Deoxys`，再注册为 Claude 的本地插件市场。安装会在 `.bashrc` 中追加带代理检查的 Claude 包装函数，通过 PATH 调用 CLI。
+
+### 4. 安装 Antigravity CLI（按需选择）
+
+需要 Linux x86_64 或 ARM64，安装原生 `agy` 二进制，不依赖 Node.js。
+无需准备配置文件或登录凭据。以下命令从仓库根目录执行：
+
+```bash
+cd setup_agy
+bash setup-user.sh       # 普通用户，系统依赖已准备好
+# 或
+bash setup-root.sh       # Debian / Ubuntu root，包含系统依赖安装
+source ~/.bashrc
+agy --version
+agy
+```
+
+使用实际运行 CLI 的用户安装，二进制位于该用户的 `~/.local/bin/agy`。
+安装脚本会提示确认代理已开启，并向 `.bashrc` 追加与 Claude Code 相同的代理
+检查包装函数；加载后执行 `agy` 会先检查 Google HTTP 响应，检查失败时阻止启动。
+首次运行 `agy` 时按提示登录。
+依赖、重复安装行为和 SSH 登录方式见 [Antigravity CLI 说明](setup_agy/README.md)。
 
 ## 本地文件与目录迁移
 

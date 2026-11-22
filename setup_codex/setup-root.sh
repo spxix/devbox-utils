@@ -76,6 +76,23 @@ if ! grep -Fqx -- "$codex_home_line" "$HOME/.bashrc"; then
     cat -- "$temp_dir/bashrc" > "$HOME/.bashrc"
 fi
 
+# 追加启动函数，沿用 setup_cc 的代理检查，避免重复追加。
+if ! grep -Fqx '# setup_codex: Codex CLI VPN wrapper' "$HOME/.bashrc"; then
+    cat >> "$HOME/.bashrc" <<'BASHRC'
+
+# setup_codex: Codex CLI VPN wrapper
+unalias codex 2>/dev/null || true
+codex() {
+    if curl -sI --max-time 5 www.google.com 2>/dev/null | head -1 | grep -q "200"; then
+        command codex "$@"
+    else
+        echo -e "\033[31mVPN 未生效，不能使用 codex\033[0m" >&2
+        return 1
+    fi
+}
+BASHRC
+fi
+
 # 7. 复制配置，覆盖同名文件；权限设为仅当前用户可读写
 echo "==> 复制 Codex 配置"
 mkdir -p -- "$config_dir"
