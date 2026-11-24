@@ -26,7 +26,7 @@ Codex 的用户选择 `setup-root.sh`（root）或 `setup-user.sh`（普通用�
 `source ~/.bashrc`，或打开新的 Bash 终端，即可直接输入 `codex` 使用该目录。
 重复安装不会重复追加该设置；更换目录后会更新脚本管理的设置行。
 
-当前模板默认使用 Codex 内置的 `openai` provider 和 `gpt-6-astra`，并开启 Full
+当前模板默认使用 Codex 内置的 `openai` provider 和 `gpt-6.2-astra`，并开启 Full
 Access、禁用命令审批：
 
 ```toml
@@ -58,8 +58,10 @@ codex login --device-auth
 登录和启动时必须使用同一个 `CODEX_HOME`。安装脚本不会自动执行登录，也不会覆盖
 目标目录中已有的登录缓存；重复运行脚本只更新 `config.toml`、CLI 和插件。
 
-安装操作开始前，脚本会提示开启代理。请确认当前终端的代理可用后按回车继续；否则
-按 Ctrl+C 退出。此步骤为人工确认，不会自动检测代理连通性；没有交互终端时会取消安装。
+安装操作开始前，脚本会先打印 `config.toml` 中当前的默认模型（`model`，以及若显式配置了的
+`review_model`），并提示开启代理。确认模型无误且当前终端代理可用后按回车继续；如需
+更换模型或代理尚未开启，按 Ctrl+C 退出，修改 `config.toml` 或开启代理后重新运行。此步骤
+为人工确认，不会自动检测代理连通性；没有交互终端时会取消安装。
 
 脚本也会向 `~/.bashrc` 追加 `codex` 包装函数，并清除同名别名；重复安装不会重复
 追加。加载 `.bashrc` 后，每次执行 `codex`（包括登录和版本检查）都先进行与

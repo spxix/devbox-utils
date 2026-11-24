@@ -20,11 +20,42 @@ for file in config.toml; do
     fi
 done
 
-# 安装前确认代理已开启
+read_toml_root_string() {
+    local key="$1"
+    local file="$2"
+    awk -v key="$key" '
+        /^[[:space:]]*\[/ { exit }
+        $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
+            sub("^[[:space:]]*" key "[[:space:]]*=[[:space:]]*", "")
+            if (match($0, /^"[^"]*"/)) {
+                print substr($0, RSTART + 1, RLENGTH - 2)
+                exit
+            }
+            if (match($0, /^'\''[^'\'']*'\''/)) {
+                print substr($0, RSTART + 1, RLENGTH - 2)
+                exit
+            }
+            sub(/[[:space:]]*(#.*)?$/, "")
+            print $0
+            exit
+        }
+    ' "$file"
+}
+
+# 安装前展示当前模型配置，并确认模型与代理已就绪
+default_model="$(read_toml_root_string "model" "$script_dir/config.toml")"
+review_model="$(read_toml_root_string "review_model" "$script_dir/config.toml")"
+echo "==> 当前配置模板：$script_dir/config.toml"
+echo "    默认模型 (model): ${default_model:-未设置（跟随 Codex 官方默认）}"
+if [[ -n "$review_model" ]]; then
+    echo "    审查模型 (review_model): $review_model"
+fi
+echo "如需更换默认模型，请按 Ctrl+C 退出，修改 $script_dir/config.toml 后重新运行本脚本。"
+echo ""
 echo "运行前请先开启代理，并确保当前终端已配置代理环境变量。"
-echo "确认代理可用后，按回车继续安装；未开启请按 Ctrl+C 退出。"
-if ! read -r -p "已开启代理，按回车继续：" </dev/tty; then
-    echo "未收到代理确认，已取消安装。" >&2
+echo "确认模型配置无误且代理可用后，按回车继续安装；否则请按 Ctrl+C 退出。"
+if ! read -r -p "已确认模型配置并开启代理，按回车继续：" </dev/tty; then
+    echo "未收到确认，已取消安装。" >&2
     exit 1
 fi
 

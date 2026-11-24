@@ -48,7 +48,7 @@ codex login
 codex
 ```
 
-安装脚本会提示确认代理已开启，并只更新 `${CODEX_HOME:-/SPXvePFS/users/wndai/.codex}` 中的配置文件。
+安装脚本会在开始前显示 `setup_codex/config.toml` 当前配置的默认模型并提示确认代理已开启，只更新 `${CODEX_HOME:-/SPXvePFS/users/wndai/.codex}` 中的配置文件。
 已有的非空 `CODEX_HOME` 优先；脚本会将选定目录保存到 `~/.bashrc`，加载后直接运行
 `codex` 即使用该目录。脚本不会自动迁移原 `~/.codex` 的数据。
 安装完成后由实际运行用户执行 `codex login`；远程服务器可执行
