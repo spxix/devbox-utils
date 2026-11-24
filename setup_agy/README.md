@@ -6,18 +6,21 @@
 [官方安装器](https://antigravity.google/cli/install.sh) 和官方发布源获取原生二进制，
 不需要 nvm、Node.js 或 npm。
 
-本目录只负责安装 CLI 与 SSH Hub Server 运行环境，不预置登录凭据，不复制账号配置，
-也不安装插件或更改权限策略。首次使用时由实际使用者完成登录。
+本目录负责安装 CLI、SSH Hub Server 运行环境以及 Deoxys 插件集合，不预置登录凭据、
+不复制账号配置，也不更改权限策略。首次使用时由实际使用者完成登录。
 
 ## 文件说明
 
-- `setup-root.sh`：Debian / Ubuntu root 入口，安装系统依赖、CLI 及 SSH 远端环境。
+- `setup-root.sh`：Debian / Ubuntu root 入口，安装系统依赖、CLI、SSH 远端环境及 Deoxys 插件。
 - `setup-user.sh`：普通用户入口，要求系统依赖已安装，不使用 sudo。
 - `setup-ssh-server.sh`：可独立运行的 SSH 远端配置脚本，负责写入 `~/.bashrc` 顶部
   SSH 代理钩子并预装 `~/.antigravity-hub-server`。
+- `setup-plugins.sh`：可独立运行的 Deoxys 插件安装脚本，负责克隆或更新
+  `~/.local/share/Deoxys`，并将与 `setup_codex` / `setup_cc` 一致的 14 个插件分别安装到
+  `~/.gemini/config/plugins/`。
 
-`setup-root.sh` 与 `setup-user.sh` 会自动调用 `setup-ssh-server.sh`；仅需修复或升级
-桌面端 SSH 远端环境时，也可单独运行 `setup-ssh-server.sh`。
+`setup-root.sh` 与 `setup-user.sh` 会自动调用 `setup-ssh-server.sh` 和 `setup-plugins.sh`；
+仅需修复/升级 SSH 远端环境或同步 Deoxys 插件时，也可单独运行对应脚本。
 
 ## 安装前准备
 
@@ -28,7 +31,7 @@
 
 ```bash
 apt-get update
-apt-get install -y --no-install-recommends ca-certificates curl coreutils tar gzip grep sed procps util-linux mawk
+apt-get install -y --no-install-recommends ca-certificates curl git coreutils tar gzip grep sed procps util-linux mawk
 ```
 
 请使用实际运行 `agy` 或供桌面端 SSH 登录的用户执行安装。CLI 二进制位于该用户的
@@ -54,7 +57,9 @@ agy --version
 ```bash
 bash setup-root.sh --hub-version 2.34.0     # 指定预安装的桌面端 Hub Server 版本
 bash setup-root.sh --skip-hub-download      # 仅写 SSH 代理钩子，跳过 Hub Server 预下载
+bash setup-root.sh --skip-plugins           # 跳过 Deoxys 插件安装
 bash setup-ssh-server.sh --version 2.34.0   # 仅单独配置/更新桌面端 SSH 远端环境
+bash setup-plugins.sh                       # 仅单独安装/更新 14 个 Deoxys 插件
 ```
 
 ### 1. CLI 安装与包装函数
@@ -138,7 +143,7 @@ agy --gemini_dir=/SPXvePFS/users/wndai/.agy
 只检查脚本语法，不执行安装：
 
 ```bash
-bash -n setup-root.sh setup-user.sh setup-ssh-server.sh
+bash -n setup-root.sh setup-user.sh setup-ssh-server.sh setup-plugins.sh
 ```
 
 安装完成后可执行 `~/.local/bin/agy --version` 验证 CLI 二进制。

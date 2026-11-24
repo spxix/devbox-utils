@@ -9,11 +9,13 @@ usage() {
 选项:
   --hub-version <ver>   指定预安装的 Antigravity Hub Server 版本（默认取最新稳定版）
   --skip-hub-download   仅配置 SSH 代理钩子，跳过 ~/.antigravity-hub-server 预下载
+  --skip-plugins        跳过 Deoxys 插件安装
   -h, --help            显示本帮助信息
 EOF
 }
 
 ssh_server_args=()
+skip_plugins=0
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --hub-version)
@@ -30,6 +32,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --skip-hub-download)
             ssh_server_args+=(--skip-download)
+            shift
+            ;;
+        --skip-plugins)
+            skip_plugins=1
             shift
             ;;
         -h|--help)
@@ -66,7 +72,7 @@ binary_path="$HOME/.local/bin/agy"
 
 # 2. 安装系统依赖；Antigravity CLI 与 SSH Hub Server 使用原生二进制，不需要 Node.js
 echo "==> 安装系统依赖"
-packages=(ca-certificates curl coreutils tar gzip grep sed procps util-linux)
+packages=(ca-certificates curl git coreutils tar gzip grep sed procps util-linux)
 if ! command -v awk >/dev/null 2>&1; then
     packages+=(mawk)
 fi
@@ -119,6 +125,12 @@ fi
 # 6. 配置 Antigravity Desktop SSH 远端代理钩子并预下载 Hub Server
 echo "==> 配置 Antigravity Desktop SSH 远端环境"
 bash "$script_dir/setup-ssh-server.sh" --no-confirm "${ssh_server_args[@]}"
+
+# 7. 安装 Deoxys 插件（与 setup_codex / setup_cc 保持一致）
+if [[ "$skip_plugins" -eq 0 ]]; then
+    echo "==> 安装 Deoxys 插件"
+    AGY_BIN="$binary_path" bash "$script_dir/setup-plugins.sh"
+fi
 
 printf '\n安装完成。请在实际运行 Antigravity CLI 的用户当前终端执行：\n'
 printf '  source %q\n' "$HOME/.bashrc"
