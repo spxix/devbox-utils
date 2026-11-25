@@ -157,7 +157,6 @@ $start_marker
 # 仅在 Antigravity SSH 引导（sh -s）及远端服务解析登录环境时静默注入代理；
 # 日常交互式 SSH 终端与其他命令不触发，保持默认直连与 proxyon/proxyoff 行为。
 if [[ "\${ANTIGRAVITY_RESOLVING_ENVIRONMENT:-}" == "1"
-    || "\${VSCODE_RESOLVING_ENVIRONMENT:-}" == "1"
     || ( -n "\${SSH_CLIENT:-}\${SSH_CONNECTION:-}" && "\${BASH_EXECUTION_STRING:-}" == "sh -s" ) ]]; then
     export http_proxy=$quoted_http
     export https_proxy=$quoted_https

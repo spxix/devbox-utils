@@ -102,8 +102,8 @@ agy
 手动 `proxyon` / `proxyoff` 的行为**：
 
 1. **`~/.bashrc` 顶部精准代理钩子**：在非交互退出守卫（如 `[ -z "$PS1" ] && return`）
-   之前写入带起止标记的幂等代码块，仅在 `ANTIGRAVITY_RESOLVING_ENVIRONMENT=1`、
-   `VSCODE_RESOLVING_ENVIRONMENT=1` 或 SSH 执行 `sh -s` 时静默导出代理变量（优先固化
+   之前写入带起止标记的幂等代码块，仅在 `ANTIGRAVITY_RESOLVING_ENVIRONMENT=1`
+   或 SSH 执行 `sh -s` 时静默导出代理变量（优先固化
    运行脚本时的当前终端代理地址，缺省回退 `127.0.0.1:7897` / `7898` 及内网绕过规则）。
    这样后续桌面端自动升级新版本时远端也能直接走代理秒级下载；若本机 Mihomo 未启动，
    本地端口立即拒绝连接并触发桌面端自带的本地回退上传。
