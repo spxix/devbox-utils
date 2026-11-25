@@ -1,8 +1,11 @@
-# Repository Guidelines
+# Repository Guidelines (Deprecated)
+
+> [!WARNING]
+> **Deprecated:** This directory is a legacy backup of the old Sub2API / API Key (`auth.json`) Codex setup and is no longer maintained. Use `../setup_codex/` for current Codex installation and configuration. Do not add new features here unless explicitly requested.
 
 ## Project Structure & Module Organization
 
-This directory contains a small Codex bootstrap kit for Debian/Ubuntu environments:
+This directory preserves the deprecated Sub2API-based Codex bootstrap kit for Debian/Ubuntu environments:
 
 - `setup-root.sh`: root installer, including system dependencies.
 - `setup-user.sh`: ordinary-user installer; system dependencies must already be available.
@@ -35,7 +38,7 @@ Run syntax checks after shell or configuration edits. For installer changes, use
 
 ## Commit & Pull Request Guidelines
 
-This checkout contains no Git metadata, so established commit conventions cannot be verified. Use concise imperative subjects, such as `Fix configuration copy permissions`. Describe the change, its installation impact, validation performed, and any linked issue. Screenshots are unnecessary for this command-line project.
+Use concise imperative subjects, such as `Mark setup_codex-sub2api-backup as deprecated`. Only touch this directory for archival notices or explicit legacy maintenance; describe the change, validation performed, and any linked issue. Screenshots are unnecessary for this command-line project.
 
 ## Security & Configuration
 

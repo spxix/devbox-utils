@@ -9,7 +9,7 @@ This directory provides the Claude Code installer within `devbox-utils`:
 - `settings.json`: optional local configuration, excluded by `.gitignore`.
 - `README.md`: installation, authentication, and startup instructions.
 
-Sibling directories `../setup_codex/` and `../setup_proxy/` contain separate utilities. There are no application modules, assets, build outputs, or dedicated test directories here.
+Sibling directories `../setup_codex/`, `../setup_agy/`, and `../setup_proxy/` contain separate utilities (`../setup_codex-sub2api-backup/` is a deprecated legacy backup). There are no application modules, assets, build outputs, or dedicated test directories here.
 
 ## Build, Test, and Development Commands
 

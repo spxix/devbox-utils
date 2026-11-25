@@ -7,9 +7,8 @@ This directory contains a small Codex bootstrap kit for Debian/Ubuntu environmen
 - `setup-root.sh`: root installer, including system dependencies.
 - `setup-user.sh`: ordinary-user installer; system dependencies must already be available.
 - `config.toml`: source template for model, provider, permissions, and terminal settings.
-- `auth.json`: Codex-generated login cache; it is not an installer input and its contents are sensitive.
 - `README.md`: user-facing instructions for authentication, configuration, installation, and startup.
-- `.gitignore`: excludes the Codex-generated login cache `auth.json` from Git.
+- `.gitignore`: keeps `auth.json` excluded from Git as a safety net against accidental commits (login caches live in the system credential store or `${CODEX_HOME}/auth.json`, not in this directory).
 
 There are no application modules, asset directories, build outputs, or automated test suites.
 
@@ -17,8 +16,8 @@ There are no application modules, asset directories, build outputs, or automated
 
 - `bash -n setup-root.sh setup-user.sh`: check both installer scripts without executing installation steps.
 - `python3 -c 'import tomllib; tomllib.load(open("config.toml", "rb"))'`: validate TOML syntax with Python 3.11 or later.
-- `bash setup-root.sh`: run the root installer on a suitable Debian/Ubuntu machine. This installs packages, updates `$HOME/.bashrc`, updates the destination configuration, preserves the Codex login cache, and installs plugins.
-- `bash setup-user.sh`: run the ordinary-user installer when system dependencies are already installed. This updates the current user's `$HOME/.bashrc`, updates the destination configuration, preserves the Codex login cache, and installs plugins.
+- `bash setup-root.sh`: run the root installer on a suitable Debian/Ubuntu machine. It displays the configured default model (`model` and optional `review_model`), prompts for interactive model/proxy confirmation, installs packages, updates `$HOME/.bashrc` (nvm, `CODEX_HOME`, and the `codex` VPN wrapper), updates the destination `config.toml`, preserves any existing Codex login cache, and installs plugins.
+- `bash setup-user.sh`: run the ordinary-user installer when system dependencies are already installed. It displays the configured default model, prompts for interactive model/proxy confirmation, updates the current user's `$HOME/.bashrc` (nvm, `CODEX_HOME`, and the `codex` VPN wrapper), updates the destination `config.toml`, preserves any existing Codex login cache, and installs plugins.
 - `source ~/.bashrc`, followed by `codex login` and `codex`: load the installed Node environment and the persisted `CODEX_HOME`, authenticate the actual runtime user, and launch Codex. Set the same `CODEX_HOME` explicitly in environments that do not load `.bashrc`.
 
 There is no separate build step. Do not run the installer merely to validate documentation changes.
@@ -35,7 +34,7 @@ Run syntax checks after shell or configuration edits. For installer changes, use
 
 ## Commit & Pull Request Guidelines
 
-This checkout contains no Git metadata, so established commit conventions cannot be verified. Use concise imperative subjects, such as `Fix configuration copy permissions`. Describe the change, its installation impact, validation performed, and any linked issue. Screenshots are unnecessary for this command-line project.
+Use concise imperative subjects, such as `Fix configuration copy permissions`. Describe the change, its installation impact, validation performed, and any linked issue. Screenshots are unnecessary for this command-line project.
 
 ## Security & Configuration
 

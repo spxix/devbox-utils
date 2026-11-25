@@ -6,11 +6,12 @@ This repository contains four independent Linux development-environment utilitie
 
 - `setup_codex/` — Debian/Ubuntu installer for nvm, Node.js 24, Codex CLI, local Codex configuration, and Deoxys plugins.
 - `setup_cc/` — ordinary-user installer for Claude Code, optional local settings, and a local Deoxys marketplace.
-- `setup_agy/` — root and ordinary-user installers for the native Antigravity CLI (`agy`) and Antigravity Desktop SSH remote server (`setup-ssh-server.sh`), without preconfigured credentials.
+- `setup_agy/` — root and ordinary-user installers for the native Antigravity CLI (`agy`), Antigravity Desktop SSH remote server (`setup-ssh-server.sh`), and Deoxys plugins (`setup-plugins.sh`), without preconfigured credentials.
 - `setup_proxy/` — Mihomo lifecycle manager, VLESS configuration handling, shell proxy helpers, and connectivity diagnostics.
+- `setup_codex-sub2api-backup/` — **(deprecated)** legacy Sub2API / API Key backup for Codex, superseded by `setup_codex/` and no longer maintained.
 - `README.md` — repository-level usage and migration instructions.
 
-Runtime data lives under `setup_proxy/.proxy/`. Treat `setup_codex/auth.json` as a Codex-generated sensitive login cache, and treat `setup_cc/settings.json` and `setup_proxy/vless.txt` as local secrets; do not publish their contents.
+Runtime data lives under `setup_proxy/.proxy/`. Codex manages its own login cache in the system credential store or `${CODEX_HOME}/auth.json` (not as an installer input in `setup_codex/`); treat any Codex `auth.json` (including legacy `setup_codex-sub2api-backup/auth.json`), `setup_cc/settings.json`, and `setup_proxy/vless.txt` as local secrets and do not publish their contents.
 
 ## Build, Test, and Development Commands
 
@@ -21,11 +22,11 @@ bash -n setup_codex/setup-root.sh setup_codex/setup-user.sh setup_cc/setup-user.
 for script in setup_agy/*.sh; do bash -n "$script" || exit; done
 python3 -c 'import json; json.load(open("setup_cc/settings.example.json"))'
 python3 -c 'import tomllib; tomllib.load(open("setup_codex/config.toml", "rb"))'
-bash -n setup_proxy/proxy.sh setup_proxy/test_connection.sh
+bash -n setup_proxy/proxy.sh setup_proxy/test_connection.sh setup_proxy/install_mihomo.sh
 python3 setup_proxy/mihomo.py check
 ```
 
-Use `python3 setup_proxy/mihomo.py start`, `proxyon`, and `proxyoff` only in an environment where starting the local proxy is intended. Do not run either CLI installer merely to validate documentation changes.
+Use `python3 setup_proxy/mihomo.py start`, `proxyon`, and `proxyoff` only in an environment where starting the local proxy is intended. Do not run any CLI installer merely to validate documentation changes.
 
 ## Coding Style & Naming Conventions
 

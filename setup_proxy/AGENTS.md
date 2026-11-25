@@ -7,6 +7,7 @@ This is a small Linux terminal proxy toolkit with no build step.
 - `mihomo.py`: Python CLI for Mihomo lifecycle, configuration, status, and connectivity checks.
 - `proxy.sh`: sourced Bash functions `proxyon`, `proxyoff`, and `print_ip_info`; sourcing defines commands without enabling the proxy.
 - `test_connection.sh`: eight connectivity checks, public IPv4 lookup, and Cloudflare diagnostics.
+- `install_mihomo.sh`: validates and extracts an uploaded Mihomo `.gz` archive into `.proxy/mihomo` without starting the proxy.
 - `reference/.bashrc-cf2`: reference from a working VPN machine; not executed by the toolkit.
 - `.proxy/`: local binary, generated configuration, process records, and logs.
 - `README.md`: Chinese user documentation; keep command examples synchronized with implementation.
@@ -16,7 +17,7 @@ This is a small Linux terminal proxy toolkit with no build step.
 Use Linux x86_64, Python 3.8+, Bash, and curl.
 
 ```bash
-bash -n proxy.sh test_connection.sh  # Validate shell syntax
+bash -n proxy.sh test_connection.sh install_mihomo.sh  # Validate shell syntax
 python3 mihomo.py check            # Validate node configuration offline
 python3 mihomo.py status           # Inspect the managed process
 python3 mihomo.py start            # Start service and install Bash startup configuration
@@ -38,7 +39,7 @@ There is no automated test framework or coverage threshold. Validate shell synta
 
 ## Commit & Pull Request Guidelines
 
-This checkout has no Git metadata, so historical commit conventions cannot be verified. Use concise imperative commit subjects. Describe changed behavior, verification commands and results, and configuration implications in pull requests; link relevant issues when available.
+Use concise imperative commit subjects. Describe changed behavior, verification commands and results, and configuration implications in pull requests; link relevant issues when available.
 
 ## Security & Agent Instructions
 

@@ -1,6 +1,11 @@
-# Codex 安装配置
+# Codex 安装配置（已废弃 / Sub2API 历史备份）
 
-在 Debian / Ubuntu 上安装 Codex CLI，并应用本目录的配置和 Deoxys 插件。
+> [!WARNING]
+> **本目录已废弃，不再维护。**
+> 这里保留的是旧版通过 Sub2API / API Key（`auth.json`）配置 Codex CLI 的历史备份。
+> 当前请改用 [`../setup_codex/`](../setup_codex/README.md)（基于 ChatGPT 账号登录、内置 `openai` provider，并包含 `CODEX_HOME` 持久化与代理检查包装函数）。
+
+在 Debian / Ubuntu 上安装 Codex CLI，并应用本目录的旧版配置和 Deoxys 插件（仅作历史参考）。
 
 ## 文件说明
 

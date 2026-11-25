@@ -9,9 +9,10 @@ Linux 开发环境实用工具：配置终端代理，以及安装 Codex CLI、C
 | `setup_proxy/` | 管理 Mihomo 代理、切换终端代理环境变量、检查网络连通性 | [终端代理](setup_proxy/README.md) |
 | `setup_codex/` | 通过 root 或普通用户脚本安装 nvm、Node.js 24、Codex CLI 和 Deoxys 插件，应用本地配置 | [Codex 安装配置](setup_codex/README.md) |
 | `setup_cc/` | 通过普通用户脚本安装 nvm、Node.js 24、Claude Code 和 Deoxys 插件，可选应用本地配置 | [Claude Code 安装配置](setup_cc/README.md) |
-| `setup_agy/` | 通过 root 或普通用户脚本安装 Antigravity CLI（`agy`）并配置桌面端 SSH 远端服务，不预置登录凭据 | [Antigravity 安装说明](setup_agy/README.md) |
+| `setup_agy/` | 通过 root 或普通用户脚本安装 Antigravity CLI（`agy`）、桌面端 SSH 远端服务和 Deoxys 插件，不预置登录凭据 | [Antigravity 安装说明](setup_agy/README.md) |
+| `setup_codex-sub2api-backup/` | **已废弃**：旧版 Sub2API / API Key 认证方案的历史备份，请改用 `setup_codex/` | [旧版备份说明（已废弃）](setup_codex-sub2api-backup/README.md) |
 
-四个工具可独立使用。如果安装 CLI 需要代理，先配置代理，再选择对应的安装脚本。
+以上四个常用工具可独立使用。如果安装 CLI 需要代理，先配置代理，再选择对应的安装脚本。
 
 ## 使用顺序
 
@@ -92,12 +93,12 @@ agy
 使用实际运行 CLI 或供桌面端 SSH 登录的用户安装。脚本会提示确认代理已开启，安装
 `~/.local/bin/agy`，向 `.bashrc` 末尾追加 CLI 代理检查包装函数，并在 `.bashrc`
 顶部写入仅针对 Antigravity SSH 引导与环境解析生效的静默代理钩子（不影响日常交互
-终端默认直连），同时预下载当前稳定版 Hub Server 二进制。仅需配置桌面端 SSH 远端
-环境时可直接运行 `bash setup_agy/setup-ssh-server.sh`。详见
-[Antigravity 安装说明](setup_agy/README.md)。
+终端默认直连），同时预下载当前稳定版 Hub Server 二进制并安装 14 个 Deoxys 插件。
+仅需配置桌面端 SSH 远端环境或同步插件时，可分别运行 `bash setup_agy/setup-ssh-server.sh`
+或 `bash setup_agy/setup-plugins.sh`。详见 [Antigravity 安装说明](setup_agy/README.md)。
 
 ## 本地文件与目录迁移
 
-`setup_codex/auth.json`、`setup_cc/settings.json`、`setup_proxy/vless.txt` 和 `setup_proxy/.proxy/` 是本机认证、节点及运行数据。`auth.json` 由 Codex 登录流程自动生成，可能改为保存在系统凭据存储中；不要提交或分享这些文件。在其他机器使用时需重新完成登录并自行准备其他本机配置。
+`${CODEX_HOME}/auth.json`（由 `codex login` 自动生成，也可能保存在系统凭据存储中，并非 `setup_codex/` 的安装输入文件）、`setup_cc/settings.json`、`setup_proxy/vless.txt` 和 `setup_proxy/.proxy/` 是本机认证、节点及运行数据（已废弃的 `setup_codex-sub2api-backup/auth.json` 亦属本机凭据）；不要提交或分享这些文件。在其他机器使用时需重新完成登录并自行准备其他本机配置。
 
 如果此前已经使用代理工具，移动目录后，已有 `~/.bashrc` 中的 `source` 路径可能仍指向旧目录，需要改为新位置。当前终端可直接 `source ./setup_proxy/proxy.sh` 加载新路径下的命令。运行中的 Mihomo 进程记录也可能保留旧路径；迁移目录不会自动重启代理或修复这些运行记录。
