@@ -7,8 +7,8 @@ Linux 开发环境实用工具：配置终端代理，以及安装 Codex CLI、C
 | 目录 | 用途 | 使用说明 |
 | --- | --- | --- |
 | `setup_proxy/` | 管理 Mihomo 代理、切换终端代理环境变量、检查网络连通性 | [终端代理](setup_proxy/README.md) |
-| `setup_codex/` | 通过 root 或普通用户脚本安装 nvm、Node.js 24、Codex CLI 和 Deoxys 插件，应用本地配置 | [Codex 安装配置](setup_codex/README.md) |
-| `setup_cc/` | 通过普通用户脚本安装 nvm、Node.js 24、Claude Code 和 Deoxys 插件，可选应用本地配置 | [Claude Code 安装配置](setup_cc/README.md) |
+| `setup_codex/` | 通过 root 或普通用户脚本安装 nvm、Node.js 24、Codex CLI 和 Deoxys 插件，应用本地配置（ChatGPT 账号登录） | [Codex 安装配置](setup_codex/README.md) |
+| `setup_cc/` | 通过普通用户脚本安装 nvm、Node.js 24、Claude Code 和 Deoxys 插件，可选应用本地配置（Sub2API 登录） | [Claude Code 安装配置](setup_cc/README.md) |
 | `setup_agy/` | 通过 root 或普通用户脚本安装 Antigravity CLI（`agy`）、桌面端 SSH 远端服务和 Deoxys 插件，不预置登录凭据 | [Antigravity 安装说明](setup_agy/README.md) |
 | `setup_codex-sub2api-backup/` | **已废弃**：旧版 Sub2API / API Key 认证方案的历史备份，请改用 `setup_codex/` | [旧版备份说明（已废弃）](setup_codex-sub2api-backup/README.md) |
 
@@ -59,11 +59,11 @@ codex
 安装会向 `.bashrc` 追加与 Claude Code 相同的代理检查包装函数；加载后执行
 `codex` 会先检查 Google HTTP 响应，检查失败时阻止启动。
 
-### 3. 安装 Claude Code（按需选择）
+### 3. 安装 Claude Code（Sub2API 登录）
 
-需要 Debian / Ubuntu，且管理员已安装系统依赖。按 [Claude Code 说明](setup_cc/README.md) 准备认证：可以沿用终端环境变量或目标目录的已有配置，也可以从 `settings.example.json` 创建本地 `settings.json`。
+需要 Debian / Ubuntu，且管理员已安装系统依赖。当前采用 Sub2API 登录，按 [Claude Code 说明](setup_cc/README.md) 准备认证：可以沿用终端环境变量或目标目录的已有配置，也可以从 `settings.example.json` 创建本地 `settings.json`。
 
-以下命令从仓库根目录执行，不要求先安装 Codex：
+以下命令从仓库根目录执行：
 
 ```bash
 cd setup_cc
@@ -74,7 +74,7 @@ claude
 
 本地 `settings.json` 缺失、空白或为 `{}` 时保留目标配置；非空 JSON 对象会覆盖 `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json`，不是合并。脚本使用普通 Git 下载或更新 `~/.local/share/Deoxys`，再注册为 Claude 的本地插件市场。安装会在 `.bashrc` 中追加带代理检查的 Claude 包装函数，通过 PATH 调用 CLI。
 
-### 4. 安装 Antigravity CLI 与桌面端 SSH 远端支持（按需选择）
+### 4. 安装 Antigravity CLI 与桌面端 SSH 远端支持
 
 需要 Linux x86_64 或 ARM64（glibc 2.26+），安装原生 `agy` 二进制并预置桌面端
 `~/.antigravity-hub-server`，不依赖 Node.js，无需准备配置文件或登录凭据。

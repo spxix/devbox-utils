@@ -1,6 +1,6 @@
-# Claude Code 安装配置
+# Claude Code 安装配置（Sub2API 登录）
 
-参考 `../setup_codex/` 的普通用户安装流程，在 Debian / Ubuntu 上通过 nvm、Node.js 24 和 npm 安装 Claude Code，并应用本地配置和 Deoxys 插件。
+参考 `../setup_codex/` 的普通用户安装流程，在 Debian / Ubuntu 上通过 nvm、Node.js 24 和 npm 安装 Claude Code，并应用本地 Sub2API 认证配置和 Deoxys 插件。
 
 ## 安装前准备
 
