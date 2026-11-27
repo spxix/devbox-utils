@@ -7,6 +7,7 @@
 - `setup-root.sh`：root 版本，包含系统依赖安装。
 - `setup-user.sh`：普通用户版本，要求系统依赖已安装。
 - `config.toml`：安装时复制的配置模板，包含模型、权限和终端设置。
+- [常见问题与修复](./TROUBLESHOOTING.md)
 - `AGENTS.md`：贡献与维护指南。
 
 登录凭据由 Codex 登录流程管理并自动刷新。登录后，缓存可能保存在系统凭据存储或
